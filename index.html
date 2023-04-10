@@ -1,0 +1,148 @@
+<html>
+
+<head>
+<title>search for a laptop</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<style>
+.wrapper {
+    height: 100%;
+    width: 100%;
+    text-align: center;
+}
+
+.search-field {
+    padding: 10px;
+}
+
+.search-result {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(40vw, 1fr));
+    grid-template-rows: repeat(auto-fit, minmax(50vh, 1fr));
+    height: 100vh;
+}
+
+.website-toolbar {
+    text-align: left;
+    background: #666;
+    border: 1px solid #666;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+}
+
+.modal {
+    display: none;
+    left: 20px;
+    top: 20px;
+    position: fixed;
+    z-index: 1;
+    width: 95%;
+    height: 95%;
+    background: #666;
+    border: 1px solid #666;
+    text-align: left;
+}
+
+.model .model-content {
+    overflow: auto;
+}
+
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+    <div id="zoomModal" class="modal">
+        <input type="button" class="close" onclick="closeModal()" value="X">
+        <div class="modal-content">
+        </div>
+    </div>
+
+    <div class="search-field">
+        <input id="search" type="text" /> 
+        <input id="searchBtn" type="button" value="search">
+    </div>
+    <div class="search-result"> </div>
+</div>
+
+<script type="text/javascript">
+let searchInput = $('#search')
+searchInput.keydown(function (event) {
+    if (event.which == 13) {
+        doSearch()
+    }
+})
+
+let searchBtn = $('#searchBtn')
+searchBtn.click(function (event) {
+    doSearch()
+});
+
+function doSearch() {
+    let searchResult = $('.search-result')
+    searchResult.empty()
+
+    const searchText = searchInput.val()
+    createSearchResult(searchResult, 'https://citycenter.jo/product/search?search=%s&sub_category=true&description=true&sort=p.price&order=ASC&limit=25', searchText)
+    createSearchResult(searchResult, 'https://smartsystems.jo/product/search?search=%s&sub_category=true&description=true&sort=p.price&order=ASC&limit=25', searchText)
+    createSearchResult(searchResult, 'https://gts.jo/product/search?search=%s&description=true&sub_category=true&sort=p.price&order=ASC&limit=25', searchText)
+    createSearchResult(searchResult, 'https://gds.jo/product/search?search=%s&description=true&sub_category=true&sort=p.price&order=ASC&limit=25', searchText)
+    createSearchResult(searchResult, 'https://pccircle.com/product-category-laptops-notebooks/?post_type=product&product_cat=0&s=%s&description=true&full_search=1&orderby=price', searchText)
+    createSearchResult(searchResult, 'https://www.isystemjordan.com/search-results?q=%s&description=true', searchText)
+}
+
+let searchResultCount = 1
+function createSearchResult(searchResult, url, searchText) {
+    let website = document.createElement('iframe')
+    website.src = url.replace('%s',searchText)
+
+    let frameContainer = document.createElement('div')
+    frameContainer.id = 'searchframe-' + searchResultCount++
+    frameContainer.classList.add('website-container')
+
+    let toolbar = document.createElement('div')
+    toolbar.classList.add('website-toolbar')
+    toolbar.innerHTML = '<input type="button" onclick="closeframe(\''+ frameContainer.id +'\')" value="X">'
+    toolbar.innerHTML += '<input type="button" onclick="zoomframe(\''+ frameContainer.id +'\')" value="+">'
+
+    frameContainer.append(toolbar)
+    frameContainer.append(website)
+
+    searchResult.append(frameContainer);
+}
+
+function closeframe(frameId) {
+    $('#'+frameId).remove()
+}
+
+function zoomframe(frameId) {
+    let modal = document.getElementById('zoomModal')
+    let frameContainer = document.getElementById(frameId)
+
+    var modelContent = modal.children[1]
+
+    modelContent.replaceChildren(frameContainer.children[1].cloneNode(true))
+    modal.style.display = "block"
+}
+
+function searchUrlQuery() {
+    const params = new URLSearchParams(window.location.search)
+    if(params.get('search')) {
+        $('#search').val(params.get('search'))
+        doSearch()
+    }
+}
+
+function closeModal() {
+    let modal = document.getElementById('zoomModal')
+    modal.style.display = "none"
+}
+
+searchUrlQuery();
+</script>
+</body>
+
+</html>
